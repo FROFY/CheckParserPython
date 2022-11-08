@@ -2,15 +2,14 @@ from aiogram import Bot, Dispatcher, executor, types
 import asyncio
 import logging
 import psycopg2
+import config
 
 from QRParse.GetOrder import OrderWithStr
 from QRParse.QrAPI import OrderWithPhoto
 
-token = "5682324905:AAGxjmZcV36GnnhPp5DSa9NYnz_kqTTM63Y"
-
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=token)
+bot = Bot(token=config.tg_token)
 
 dp = Dispatcher(bot)
 

@@ -1,7 +1,8 @@
 import requests
+import config
 
-url = 'https://proverkacheka.com/api/v1/check/get'
-token = '17229.R0nyP64mqKF7EaTHZ'
+url = config.url
+token = config.token
 
 
 def OrderWithStr(qr_string):
