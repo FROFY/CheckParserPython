@@ -4,7 +4,7 @@ url = 'https://proverkacheka.com/api/v1/check/get'
 token = '17229.R0nyP64mqKF7EaTHZ'
 
 
-def print_hi(qr_string):
+def OrderWithStr(qr_string):
     data = {
         'token': token,
         'qrraw': qr_string
