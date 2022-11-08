@@ -16,3 +16,13 @@ def OrderWithStr(qr_string):
     count = items["data"]["json"]["items"][0]["quantity"]
     return item, price, count
 
+
+def OrderWithPhoto():
+    data = {
+        'token': token
+    }
+    files = {
+        'qrfile': open(r"C:\Users\Kukushkin_IA\Downloads\receipt.jpg", 'rb')
+    }
+    response = requests.post(url=url, data=data, files=files)
+    return response.json()
