@@ -1,3 +1,5 @@
+import io
+
 from aiogram import Bot, Dispatcher, executor, types
 import asyncio
 import logging
@@ -6,6 +8,7 @@ import config
 
 from QRParse.GetOrder import OrderWithStr
 from QRParse.QrAPI import OrderWithPhoto
+from Telegram.Keyboard import keyboard
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,7 +24,7 @@ dp = Dispatcher(bot)
 #     print(f'От: {message.from_user.username} | Сообщение: {message.text} | Ответ: {answer}')
 
 
-@dp.message_handler(commands=['data'])
+@dp.message_handler(lambda message: message.text == "Получить из базы")
 async def orders(message: types.Message):
     conn = psycopg2.connect(dbname='FROFY', user='SA',
                             password='SA', host='localhost')
@@ -38,11 +41,19 @@ async def orders(message: types.Message):
     await message.answer(f'Название: {orders[0]}\nКоличество: {orders[2]}\nЦена: {orders[1]}р')
 
 
+@dp.message_handler(content_types=['photo'])
+async def get_photo(message: types.Message):
+    await message.photo[-1].download(
+        destination_file=f'tmp//{message.photo[-1].file_id}.png')
+    await message.answer(message.photo[-1].file_id)
+
+
 @dp.message_handler(commands=['qrcode'])
 async def orders(message: types.Message):
     orders = OrderWithPhoto()
     await message.answer(orders["data"]["json"]["items"][0]["name"])
 
-# @dp.message_handler(commands=['help'])
-# async def start_fn(message: types.Message):
-#    await message.answer(message.from_user.id)
+
+@dp.message_handler(commands=['start'])
+async def start_fn(message: types.Message):
+    await message.answer(f'Приветствую {message.from_user.username}', reply_markup=keyboard)
