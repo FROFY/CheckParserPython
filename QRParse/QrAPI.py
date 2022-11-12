@@ -18,12 +18,12 @@ def OrderWithStr(qr_string):
     return item, price, count
 
 
-def OrderWithPhoto():
+def get_order_photo(path):
     data = {
         'token': token
     }
     files = {
-        'qrfile': open(r"C:\Users\Kukushkin_IA\Downloads\receipt.jpg", 'rb')
+        'qrfile': open(fr"{path}", 'rb')
     }
     response = requests.post(url=url, data=data, files=files)
-    return response.json()
+    return response.json()['data']['json']

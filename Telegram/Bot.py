@@ -4,10 +4,15 @@ from aiogram import Bot, Dispatcher, executor, types
 import asyncio
 import logging
 import psycopg2
+import uuid
+
+import QRParse.QrAPI
+from DBFunc.DBMethods import *
 import config
 
+
 from QRParse.GetOrder import OrderWithStr
-from QRParse.QrAPI import OrderWithPhoto
+from QRParse.QrAPI import get_order_photo
 from Telegram.Keyboard import keyboard
 
 logging.basicConfig(level=logging.INFO)
@@ -26,13 +31,8 @@ dp = Dispatcher(bot)
 
 @dp.message_handler(lambda message: message.text == "Получить из базы")
 async def orders(message: types.Message):
-    conn = psycopg2.connect(dbname='FROFY', user='SA',
-                            password='SA', host='localhost')
-    cursor = conn.cursor()
-    cursor.execute('select * from Товары')
-    records = cursor.fetchall()
+    records = db_data()
     await message.answer(f'{records}')
-    conn.close()
 
 
 @dp.message_handler(commands=['orders'])
@@ -43,9 +43,13 @@ async def orders(message: types.Message):
 
 @dp.message_handler(content_types=['photo'])
 async def get_photo(message: types.Message):
+    unique_name = uuid.uuid4()
     await message.photo[-1].download(
-        destination_file=f'tmp//{message.photo[-1].file_id}.png')
-    await message.answer(message.photo[-1].file_id)
+        destination_file=f'tmp//{unique_name}.png')
+    data = QRParse.QrAPI.get_order_photo(f'tmp//{unique_name}.png')
+    items, price = QRParse.GetOrder.parse_json(data)
+    for i in range(len(items)):
+        await message.answer(f'Товар: {items[i]}\nЦена: {price[i]}р')
 
 
 @dp.message_handler(commands=['qrcode'])
@@ -56,4 +60,10 @@ async def orders(message: types.Message):
 
 @dp.message_handler(commands=['start'])
 async def start_fn(message: types.Message):
-    await message.answer(f'Приветствую {message.from_user.username}', reply_markup=keyboard)
+    await message.answer(f'Приветствую {message.from_user.username}', reply_markup=keyboard)@dp.message_handler(commands=['start'])
+
+
+@dp.message_handler(commands=['insert'])
+async def start_fn(message: types.Message):
+    db_insert(1)
+    await message.answer('Выполняю', reply_markup=keyboard)

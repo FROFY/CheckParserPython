@@ -16,3 +16,11 @@ def OrderWithStr(qr_string):
     count = items["data"]["json"]["items"][0]["quantity"]
     return item, price, count
 
+
+def parse_json(data):
+    items = []
+    price = []
+    for i in range(data['items'].__len__()):
+        items.append(data['items'][i]['name'])
+        price.append(data['items'][i]['price'] / 100)
+    return items, price
